@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>macneopassfree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #111111;
+            color: #f2f2f2;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            width: 380px;
+            min-height: 400px;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Header */
+        .header {
+            background-color: #111111;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #ffffff;
+            letter-spacing: -0.02em;
+        }
+
+        .version {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Inter', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background-color: #111111;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 14px 10px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: inherit;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            color: rgba(255, 255, 255, 0.7);
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .tab-button.active {
+            color: #ffffff;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #ffffff;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            min-height: 320px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Section Styles */
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'Inter', monospace;
+        }
+
+        /* Batch Solve Button */
+        .batch-solve-container {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        #startBatchSolve {
+            width: 100%;
+            padding: 16px 24px;
+            background-color: #ffffff;
+            color: #111111;
+            border: none;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #startBatchSolve:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        #startBatchSolve:active {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        #startBatchSolve:disabled {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        #batchSolveStatus {
+            margin-top: 16px;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .batch-description {
+            margin-top: 20px;
+            padding: 16px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .batch-description h4 {
+            font-size: 10px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .batch-description ul {
+            list-style:circle;
+            padding: 0;
+        }
+
+        .batch-description li {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .batch-description li:last-child {
+            border-bottom: none;
+        }
+
+        .batch-description li::before {
+            content: '→';
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Shortcuts List */
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .shortcut-item:last-child {
+            border-bottom: none;
+        }
+
+        .shortcut-key {
+            font-size: 11px;
+            padding: 4px 8px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-family: 'Inter', monospace;
+        }
+
+        .shortcut-desc {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 8px;
+            font-family: 'Inter', monospace;
+        }
+
+        .glow-input {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f2f2f2;
+            font-family: inherit;
+            font-size: 13px;
+            transition: border-color 0.2s ease;
+        }
+
+        .glow-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .glow-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 20px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .btn-primary {
+            background-color: #ffffff;
+            color: #111111;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Info Box */
+        .info-box {
+            padding: 14px;
+            background-color: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 16px;
+        }
+
+        .info-box p {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+        }
+
+        /* Error Message */
+        #error {
+            padding: 12px 20px;
+            background-color: rgba(239, 68, 68, 0.1);
+            border-bottom: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            font-size: 12px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Shortcuts Tab Sections */
+        .shortcuts-section {
+            margin-bottom: 16px;
+        }
+
+        .shortcuts-section-title {
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Uninstall Button */
+        #uninstallButton {
+            width: 100%;
+            padding: 12px;
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #uninstallButton:hover {
+            background-color: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Account Info Styles */
+        .account-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .account-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .account-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .account-value {
+            font-size: 13px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        /* Accent colors for credits */
+        .credits-mcq {
+            color: #fbbf24 !important;
+        }
+
+        .credits-coding {
+            color: #60a5fa !important;
+        }
+
+        /* Buy Credits Button - Accent styled */
+        .btn-accent {
+            background-color: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        .btn-accent:hover {
+            background-color: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M4.6109 4.68601C4.72546 4.54406 4.90822 4.47575 5.0878 4.50778L16.575 6.55656C16.6715 6.57377 16.7608 6.61896 16.8318 6.68651L19.3446 9.07676C19.5379 9.26064 19.5528 9.5639 19.3784 9.76583L11.122 19.3268C11.0084 19.4583 10.8347 19.5214 10.6632 19.4935C10.4917 19.4656 10.347 19.3506 10.281 19.1898L4.53742 5.18979C4.46819 5.02103 4.49635 4.82796 4.6109 4.68601ZM6.19646 6.59904L10.4853 17.053L11.2894 10.6786L6.19646 6.59904ZM12.2688 10.9045L11.4468 17.4207L17.7491 10.1226L12.2688 10.9045ZM17.9075 9.08986L13.7298 9.68594L16.4453 7.69901L17.9075 9.08986ZM15.2483 7.33573L6.84451 5.83688L11.8343 9.83381L15.2483 7.33573Z" fill="#ffffff"/>
+            </svg>
+            <div class="logo-text">macneopassfree</div>
+        </div>
+        <div class="version" id="extensionVersion">v1.0</div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <button class="tab-button active" data-tab="account-tab">Home</button>
+        <button class="tab-button" data-tab="solve-tab">Solve</button>
+        <button class="tab-button" data-tab="shortcuts-tab">Shortcuts</button>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error" class="hidden"></div>
+
+    <!-- Tab Contents -->
+    <div id="solve-tab" class="tab-content">
+        <div class="batch-solve-container">
+            <button id="startBatchSolve">
+                ► EXECUTE BATCH SOLVE
+            </button>
+            <div id="batchSolveStatus" class="hidden"></div>
+        </div>
+
+        <div class="batch-description">
+            <h4>Features</h4>
+            <ul type="none">
+                <li>Auto-mark correct answers in one click</li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <p>All AI features in this build are open-access. Compatible with the Examly/Iamneo platform.</p>
+        </div>
+    </div>
+
+    <div id="shortcuts-tab" class="tab-content">
+        <div class="shortcuts-section">
+            <div class="shortcuts-section-title">Coding Questions (Examly/Iamneo)</div>
+            <div class="shortcut-item">
+                <span class="shortcut-key" id="typing-shortcut">Alt+Shift+T</span>
+                <span class="shortcut-desc">Auto type code / Resume Auto Type</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-key">Escape</span>
+                <span class="shortcut-desc">Stop auto typing</span>
+            </div>
+        </div>
+        
+        <div class="shortcuts-section">
+            <div class="shortcuts-section-title">MCQ / General</div>
+            <div class="shortcut-item">
+                <span class="shortcut-key">Alt+Shift+A</span>
+                <span class="shortcut-desc">AI solve (instant paste)</span>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-key" id="batch-solve-shortcut">Alt+Shift+Q</span>
+                <span class="shortcut-desc">Solve current question</span>
+            </div>
+        </div>
+
+        <div class="shortcuts-section">
+            <div class="shortcuts-section-title">Utility</div>
+            <div class="shortcut-item">
+                <span class="shortcut-key">Alt+Shift+V</span>
+                <span class="shortcut-desc">Custom paste (bypass blocks)</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="account-tab" class="tab-content active">
+        <div class="section">
+            <div class="section-title">Open Access</div>
+            <div class="info-box">
+                <p>Login, registration, and logout have been removed from this build. Open the Solve tab to run batch solve, or use the shortcuts tab for quick actions on supported pages.</p>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section">
+            <div class="section-title">Extension</div>
+            <button id="uninstallButton">Uninstall Extension</button>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
