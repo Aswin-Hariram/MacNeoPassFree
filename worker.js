@@ -620,7 +620,10 @@ async function queryRequest(text, isMCQ = false, isMultipleChoice = false, tabId
             let errorType = 'network';
             let detailedInfo = 'Failed to connect to the service. This could be due to network issues or service downtime.';
             
-            if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            if (error.message.includes('Unable to reach backend at')) {
+                errorMessage = 'Backend service is unreachable. Please verify the server URL and that it is running.';
+                detailedInfo = error.message;
+            } else if (error.name === 'TypeError' && error.message.includes('fetch')) {
                 errorMessage = 'Unable to connect to the service. Please try again.';
                 detailedInfo = 'Network connection failed. Please check your internet connection and try again.';
             } else if (error.message.includes('timeout')) {
@@ -650,15 +653,29 @@ async function makeApiRequest(url, method, body = null) {
         'Content-Type': 'application/json'
     };
 
+    const controller = new AbortController();
     const options = {
         method,
         headers,
+        signal: controller.signal,
         ...(body && {
             body: JSON.stringify(body)
         })
     };
 
-    return fetch(url, options);
+    const timeoutId = setTimeout(() => controller.abort(), CONFIG.REQUEST_TIMEOUT);
+
+    try {
+        return await fetch(url, options);
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            throw new Error(`Request timeout after ${CONFIG.REQUEST_TIMEOUT}ms while contacting ${url}`);
+        }
+
+        throw new Error(`Unable to reach backend at ${url}: ${error.message}`);
+    } finally {
+        clearTimeout(timeoutId);
+    }
 }
 
 // Listen for getMcqCredits message to check available credits before batch solve
