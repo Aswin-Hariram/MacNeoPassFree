@@ -154,11 +154,34 @@ function htmlToText(element) {
     return clone.innerText.trim();
 }
 
+function getExamlyCombinedQuestionText() {
+    const commonContentElement = document.querySelector('div[aria-labelledby="common-content"]');
+    const questionElement = document.querySelector('div[aria-labelledby="question-data"]');
+
+    const commonContentText = commonContentElement ? htmlToText(commonContentElement) : '';
+    const questionText = questionElement ? htmlToText(questionElement) : '';
+
+    if (commonContentText && questionText) {
+        if (commonContentText === questionText) {
+            return questionText;
+        }
+
+        if (questionText.includes(commonContentText)) {
+            return questionText;
+        }
+
+        if (commonContentText.includes(questionText)) {
+            return commonContentText;
+        }
+    }
+
+    return [commonContentText, questionText].filter(Boolean).join('\n\n');
+}
+
 // Function to extract the question, code, and options
 function extractQuestionCodeAndOptions() {
     // Extracting the question text
-    const questionElement = document.querySelector('div[aria-labelledby="question-data"]');
-    const questionText = questionElement ? htmlToText(questionElement) : '';
+    const questionText = getExamlyCombinedQuestionText();
 
     // Extracting the code
     const codeLines = [];
@@ -214,8 +237,7 @@ function extractCodingQuestion() {
     const programmingLanguage = programmingLanguageElement ? programmingLanguageElement.innerText.trim() : 'Programming language not found.';
 
     // Extract question components
-    const questionElement = document.querySelector('div[aria-labelledby="question-data"]');
-    const questionText = questionElement ? htmlToText(questionElement) : 'Question not found.';
+    const questionText = getExamlyCombinedQuestionText() || 'Question not found.';
 
     const inputFormatElement = document.querySelector('div[aria-labelledby="input-format"]');
     const inputFormatText = inputFormatElement ? htmlToText(inputFormatElement) : '';
@@ -1348,8 +1370,7 @@ async function scrapeAll() {
             await new Promise(r => setTimeout(r, 600));
             
             // Use existing selector for question text
-            const questionElement = document.querySelector('div[aria-labelledby="question-data"]');
-            const questionText = questionElement ? htmlToText(questionElement) : '';
+            const questionText = getExamlyCombinedQuestionText();
             
             // Use existing selector for options
             const optionsElements = document.querySelectorAll('div[aria-labelledby="each-option"]');

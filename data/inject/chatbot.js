@@ -452,11 +452,33 @@ if (typeof window.isMac === 'undefined') {
             return null;
         }
 
-        function extractExamlyQuestion() {
+        function getExamlyCombinedQuestionText() {
+            const commonContentElement = document.querySelector('div[aria-labelledby="common-content"]');
             const questionElement = document.querySelector('div[aria-labelledby="question-data"]');
-            if (!questionElement) return null;
 
-            const questionText = questionElement.innerText.trim();
+            const commonContentText = commonContentElement ? commonContentElement.innerText.trim() : '';
+            const questionText = questionElement ? questionElement.innerText.trim() : '';
+
+            if (commonContentText && questionText) {
+                if (commonContentText === questionText) {
+                    return questionText;
+                }
+
+                if (questionText.includes(commonContentText)) {
+                    return questionText;
+                }
+
+                if (commonContentText.includes(questionText)) {
+                    return commonContentText;
+                }
+            }
+
+            return [commonContentText, questionText].filter(Boolean).join('\n\n');
+        }
+
+        function extractExamlyQuestion() {
+            const questionText = getExamlyCombinedQuestionText();
+            if (!questionText) return null;
 
             // Check if it's a coding question
             const codingQuestionElement = document.querySelector('div[aria-labelledby="input-format"]');
